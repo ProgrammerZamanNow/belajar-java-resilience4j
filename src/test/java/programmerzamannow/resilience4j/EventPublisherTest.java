@@ -1,6 +1,7 @@
 package programmerzamannow.resilience4j;
 
 import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
@@ -29,5 +30,17 @@ public class EventPublisherTest {
 
   private String hello() {
     throw new IllegalArgumentException("Ups");
+  }
+
+  @Test
+  void registry() {
+    RetryRegistry registry = RetryRegistry.ofDefaults();
+    registry.getEventPublisher().onEntryAdded(event -> {
+      log.info("Add new entry {}", event.getAddedEntry().getName());
+    });
+
+    registry.retry("pzn");
+    registry.retry("pzn");
+    registry.retry("pzn2");
   }
 }
